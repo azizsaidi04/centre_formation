@@ -1,0 +1,270 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>MainWindow</class>
+ <widget class="QMainWindow" name="MainWindow">
+  <property name="geometry">
+   <rect><x>0</x><y>0</y><width>1050</width><height>700</height></rect>
+  </property>
+  <property name="windowTitle">
+   <string>Centre de Formation - Dashboard</string>
+  </property>
+  <widget class="QWidget" name="centralwidget">
+   <layout class="QHBoxLayout" name="mainLayout">
+    <property name="leftMargin"><number>0</number></property>
+    <property name="topMargin"><number>0</number></property>
+    <property name="rightMargin"><number>0</number></property>
+    <property name="bottomMargin"><number>0</number></property>
+    <property name="spacing"><number>0</number></property>
+    
+    <!-- SIDEBAR -->
+    <item>
+     <widget class="QFrame" name="sidebar">
+      <property name="minimumSize"><size><width>220</width><height>0</height></size></property>
+      <property name="maximumSize"><size><width>220</width><height>16777215</height></size></property>
+      <layout class="QVBoxLayout" name="sidebarLayout">
+       <item><widget class="QLabel" name="lbl_logo"><property name="text"><string>🎓 FORMATION</string></property></widget></item>
+       <item><widget class="QPushButton" name="btn_nav_formateurs"><property name="text"><string>Gestion Formateurs</string></property><property name="checkable"><bool>true</bool></property><property name="checked"><bool>true</bool></property><property name="autoExclusive"><bool>true</bool></property></widget></item>
+       <item><widget class="QPushButton" name="btn_nav_cours"><property name="text"><string>Gestion Cours</string></property><property name="checkable"><bool>true</bool></property><property name="autoExclusive"><bool>true</bool></property></widget></item>
+       <item><widget class="QPushButton" name="btn_nav_stats"><property name="text"><string>Statistiques</string></property><property name="checkable"><bool>true</bool></property><property name="autoExclusive"><bool>true</bool></property></widget></item>
+       <item><spacer name="verticalSpacer"><property name="orientation"><enum>Qt::Vertical</enum></property></spacer></item>
+      </layout>
+     </widget>
+    </item>
+    
+    <!-- STACKED WIDGET (RIGHT AREA) -->
+    <item>
+     <widget class="QStackedWidget" name="stackedWidget">
+      <property name="currentIndex"><number>0</number></property>
+      
+      <!-- PAGE 0: FORMATEUR DASHBOARD -->
+      <widget class="QWidget" name="page_formateur_dashboard">
+       <layout class="QVBoxLayout" name="vl_fd">
+        <property name="margin"><number>20</number></property>
+        <!-- Top controls -->
+        <item>
+         <layout class="QHBoxLayout" name="hl_fd_top">
+          <item><widget class="QPushButton" name="btn_go_add_formateur"><property name="text"><string>+ Nouveau Formateur</string></property></widget></item>
+          <item><spacer><property name="orientation"><enum>Qt::Horizontal</enum></property></spacer></item>
+          <item><widget class="QLineEdit" name="le_recherche_formateur"><property name="placeholderText"><string>Recherche...</string></property></widget></item>
+          <item><widget class="QPushButton" name="btn_rechercher_formateur"><property name="text"><string>Rechercher</string></property></widget></item>
+          <item><widget class="QComboBox" name="cb_critere_formateur"><item><property name="text"><string>nom</string></property></item><item><property name="text"><string>prenom</string></property></item><item><property name="text"><string>specialite</string></property></item></widget></item>
+          <item><widget class="QComboBox" name="cb_ordre_formateur"><item><property name="text"><string>ASC</string></property></item><item><property name="text"><string>DESC</string></property></item></widget></item>
+          <item><widget class="QPushButton" name="btn_trier_formateur"><property name="text"><string>Trier</string></property></widget></item>
+         </layout>
+        </item>
+        <!-- Body: Table + Details -->
+        <item>
+         <layout class="QHBoxLayout" name="hl_fd_body">
+          <item><widget class="QTableView" name="tv_formateur"><property name="selectionBehavior"><enum>QAbstractItemView::SelectRows</enum></property><property name="selectionMode"><enum>QAbstractItemView::SingleSelection</enum></property></widget></item>
+          <item>
+           <widget class="QGroupBox" name="gb_details_formateur">
+            <property name="title"><string>Détails du Formateur</string></property>
+            <property name="minimumSize"><size><width>320</width><height>0</height></size></property>
+            <property name="maximumSize"><size><width>320</width><height>16777215</height></size></property>
+            <layout class="QVBoxLayout">
+             <item>
+              <widget class="QStackedWidget" name="sw_details_f">
+               <property name="currentIndex"><number>0</number></property>
+               <!-- Page 0: Empty State -->
+               <widget class="QWidget" name="page_empty_f">
+                <layout class="QVBoxLayout">
+                 <item>
+                  <widget class="QLabel" name="lbl_empty_f">
+                   <property name="text"><string>📌 Veuillez sélectionner un formateur dans le tableau pour afficher et modifier ses détails.</string></property>
+                   <property name="alignment"><set>Qt::AlignCenter</set></property>
+                   <property name="wordWrap"><bool>true</bool></property>
+                  </widget>
+                 </item>
+                </layout>
+               </widget>
+               <!-- Page 1: Details Form -->
+               <widget class="QWidget" name="page_data_f">
+                <layout class="QFormLayout" name="fl_fd">
+                 <property name="verticalSpacing"><number>15</number></property>
+                 <item row="0" column="0"><widget class="QLabel" name="l1"><property name="text"><string>ID:</string></property></widget></item>
+                 <item row="0" column="1"><widget class="QLineEdit" name="le_id_formateur"><property name="readOnly"><bool>true</bool></property></widget></item>
+                 <item row="1" column="0"><widget class="QLabel" name="l2"><property name="text"><string>Nom:</string></property></widget></item>
+                 <item row="1" column="1"><widget class="QLineEdit" name="le_nom_formateur"/></item>
+                 <item row="2" column="0"><widget class="QLabel" name="l3"><property name="text"><string>Prénom:</string></property></widget></item>
+                 <item row="2" column="1"><widget class="QLineEdit" name="le_prenom_formateur"/></item>
+                 <item row="3" column="0"><widget class="QLabel" name="l4"><property name="text"><string>Email:</string></property></widget></item>
+                 <item row="3" column="1"><widget class="QLineEdit" name="le_email_formateur"/></item>
+                 <item row="4" column="0"><widget class="QLabel" name="l5"><property name="text"><string>Spécialité:</string></property></widget></item>
+                 <item row="4" column="1"><widget class="QLineEdit" name="le_specialite_formateur"/></item>
+                 <item row="5" column="0" colspan="2"><spacer><property name="orientation"><enum>Qt::Vertical</enum></property></spacer></item>
+                 <item row="6" column="0" colspan="2">
+                  <layout class="QHBoxLayout">
+                   <item><widget class="QPushButton" name="btn_modifier_formateur"><property name="text"><string>Modifier</string></property></widget></item>
+                   <item><widget class="QPushButton" name="btn_supprimer_formateur"><property name="text"><string>Supprimer</string></property></widget></item>
+                  </layout>
+                 </item>
+                </layout>
+               </widget>
+              </widget>
+             </item>
+            </layout>
+           </widget>
+          </item>
+         </layout>
+        </item>
+        <item><widget class="QPushButton" name="btn_pdf_formateur"><property name="text"><string>Exporter PDF</string></property></widget></item>
+       </layout>
+      </widget>
+      
+      <!-- PAGE 1: ADD FORMATEUR FORM -->
+      <widget class="QWidget" name="page_add_formateur">
+       <layout class="QVBoxLayout" name="vl_af">
+        <property name="margin"><number>40</number></property>
+        <item>
+         <widget class="QGroupBox" name="gb_add_f">
+          <property name="title"><string>Créer un Nouveau Formateur</string></property>
+          <layout class="QFormLayout" name="fl_add_f">
+           <property name="verticalSpacing"><number>15</number></property>
+           <item row="0" column="0"><widget class="QLabel" name="la1"><property name="text"><string>ID:</string></property></widget></item>
+           <item row="0" column="1"><widget class="QLineEdit" name="le_add_id_f"/></item>
+           <item row="1" column="0"><widget class="QLabel" name="la2"><property name="text"><string>Nom:</string></property></widget></item>
+           <item row="1" column="1"><widget class="QLineEdit" name="le_add_nom_f"/></item>
+           <item row="2" column="0"><widget class="QLabel" name="la3"><property name="text"><string>Prénom:</string></property></widget></item>
+           <item row="2" column="1"><widget class="QLineEdit" name="le_add_prenom_f"/></item>
+           <item row="3" column="0"><widget class="QLabel" name="la4"><property name="text"><string>Email:</string></property></widget></item>
+           <item row="3" column="1"><widget class="QLineEdit" name="le_add_email_f"/></item>
+           <item row="4" column="0"><widget class="QLabel" name="la5"><property name="text"><string>Spécialité:</string></property></widget></item>
+           <item row="4" column="1"><widget class="QLineEdit" name="le_add_spec_f"/></item>
+           <item row="5" column="0" colspan="2"><spacer><property name="orientation"><enum>Qt::Vertical</enum></property></spacer></item>
+           <item row="6" column="0" colspan="2">
+            <layout class="QHBoxLayout">
+             <item><widget class="QPushButton" name="btn_cancel_add_f"><property name="text"><string>Annuler</string></property></widget></item>
+             <item><widget class="QPushButton" name="btn_ajouter_formateur"><property name="text"><string>Enregistrer le Formateur</string></property></widget></item>
+            </layout>
+           </item>
+          </layout>
+         </widget>
+        </item>
+        <item><spacer><property name="orientation"><enum>Qt::Vertical</enum></property></spacer></item>
+       </layout>
+      </widget>
+
+      <!-- PAGE 2: COURS DASHBOARD -->
+      <widget class="QWidget" name="page_cours_dashboard">
+       <layout class="QVBoxLayout" name="vl_cd">
+        <property name="margin"><number>20</number></property>
+        <!-- Top controls -->
+        <item>
+         <layout class="QHBoxLayout" name="hl_cd_top">
+          <item><widget class="QPushButton" name="btn_go_add_cours"><property name="text"><string>+ Nouveau Cours</string></property></widget></item>
+          <item><spacer><property name="orientation"><enum>Qt::Horizontal</enum></property></spacer></item>
+          <item><widget class="QLineEdit" name="le_recherche_cours"><property name="placeholderText"><string>Recherche...</string></property></widget></item>
+          <item><widget class="QPushButton" name="btn_rechercher_cours"><property name="text"><string>Rechercher</string></property></widget></item>
+          <item><widget class="QComboBox" name="cb_critere_cours"><item><property name="text"><string>intitule</string></property></item><item><property name="text"><string>duree_heures</string></property></item><item><property name="text"><string>prix</string></property></item></widget></item>
+          <item><widget class="QComboBox" name="cb_ordre_cours"><item><property name="text"><string>ASC</string></property></item><item><property name="text"><string>DESC</string></property></item></widget></item>
+          <item><widget class="QPushButton" name="btn_trier_cours"><property name="text"><string>Trier</string></property></widget></item>
+         </layout>
+        </item>
+        <!-- Body: Table + Details -->
+        <item>
+         <layout class="QHBoxLayout" name="hl_cd_body">
+          <item><widget class="QTableView" name="tv_cours"><property name="selectionBehavior"><enum>QAbstractItemView::SelectRows</enum></property><property name="selectionMode"><enum>QAbstractItemView::SingleSelection</enum></property></widget></item>
+          <item>
+           <widget class="QGroupBox" name="gb_details_cours">
+            <property name="title"><string>Détails du Cours</string></property>
+            <property name="minimumSize"><size><width>320</width><height>0</height></size></property>
+            <property name="maximumSize"><size><width>320</width><height>16777215</height></size></property>
+            <layout class="QVBoxLayout">
+             <item>
+              <widget class="QStackedWidget" name="sw_details_c">
+               <property name="currentIndex"><number>0</number></property>
+               <!-- Page 0: Empty State -->
+               <widget class="QWidget" name="page_empty_c">
+                <layout class="QVBoxLayout">
+                 <item>
+                  <widget class="QLabel" name="lbl_empty_c">
+                   <property name="text"><string>📌 Veuillez sélectionner un cours dans le tableau pour afficher et modifier ses détails.</string></property>
+                   <property name="alignment"><set>Qt::AlignCenter</set></property>
+                   <property name="wordWrap"><bool>true</bool></property>
+                  </widget>
+                 </item>
+                </layout>
+               </widget>
+               <!-- Page 1: Details Form -->
+               <widget class="QWidget" name="page_data_c">
+                <layout class="QFormLayout" name="fl_cd">
+                 <property name="verticalSpacing"><number>15</number></property>
+                 <item row="0" column="0"><widget class="QLabel" name="lc1"><property name="text"><string>ID Cours:</string></property></widget></item>
+                 <item row="0" column="1"><widget class="QLineEdit" name="le_id_cours"><property name="readOnly"><bool>true</bool></property></widget></item>
+                 <item row="1" column="0"><widget class="QLabel" name="lc2"><property name="text"><string>Intitulé:</string></property></widget></item>
+                 <item row="1" column="1"><widget class="QLineEdit" name="le_intitule_cours"/></item>
+                 <item row="2" column="0"><widget class="QLabel" name="lc3"><property name="text"><string>Durée (H):</string></property></widget></item>
+                 <item row="2" column="1"><widget class="QLineEdit" name="le_duree_cours"/></item>
+                 <item row="3" column="0"><widget class="QLabel" name="lc4"><property name="text"><string>Prix:</string></property></widget></item>
+                 <item row="3" column="1"><widget class="QLineEdit" name="le_prix_cours"/></item>
+                 <item row="4" column="0"><widget class="QLabel" name="lc5"><property name="text"><string>ID Format.:</string></property></widget></item>
+                 <item row="4" column="1"><widget class="QLineEdit" name="le_id_formateur_cours"/></item>
+                 <item row="5" column="0" colspan="2"><spacer><property name="orientation"><enum>Qt::Vertical</enum></property></spacer></item>
+                 <item row="6" column="0" colspan="2">
+                  <layout class="QHBoxLayout">
+                   <item><widget class="QPushButton" name="btn_modifier_cours"><property name="text"><string>Modifier</string></property></widget></item>
+                   <item><widget class="QPushButton" name="btn_supprimer_cours"><property name="text"><string>Supprimer</string></property></widget></item>
+                  </layout>
+                 </item>
+                </layout>
+               </widget>
+              </widget>
+             </item>
+            </layout>
+           </widget>
+          </item>
+         </layout>
+        </item>
+        <item><widget class="QPushButton" name="btn_pdf_cours"><property name="text"><string>Exporter PDF</string></property></widget></item>
+       </layout>
+      </widget>
+
+      <!-- PAGE 3: ADD COURS FORM -->
+      <widget class="QWidget" name="page_add_cours">
+       <layout class="QVBoxLayout" name="vl_ac">
+        <property name="margin"><number>40</number></property>
+        <item>
+         <widget class="QGroupBox" name="gb_add_c">
+          <property name="title"><string>Créer un Nouveau Cours</string></property>
+          <layout class="QFormLayout" name="fl_add_c">
+           <property name="verticalSpacing"><number>15</number></property>
+           <item row="0" column="0"><widget class="QLabel" name="lac1"><property name="text"><string>ID Cours:</string></property></widget></item>
+           <item row="0" column="1"><widget class="QLineEdit" name="le_add_id_c"/></item>
+           <item row="1" column="0"><widget class="QLabel" name="lac2"><property name="text"><string>Intitulé:</string></property></widget></item>
+           <item row="1" column="1"><widget class="QLineEdit" name="le_add_intitule_c"/></item>
+           <item row="2" column="0"><widget class="QLabel" name="lac3"><property name="text"><string>Durée (H):</string></property></widget></item>
+           <item row="2" column="1"><widget class="QLineEdit" name="le_add_duree_c"/></item>
+           <item row="3" column="0"><widget class="QLabel" name="lac4"><property name="text"><string>Prix:</string></property></widget></item>
+           <item row="3" column="1"><widget class="QLineEdit" name="le_add_prix_c"/></item>
+           <item row="4" column="0"><widget class="QLabel" name="lac5"><property name="text"><string>ID Format.:</string></property></widget></item>
+           <item row="4" column="1"><widget class="QLineEdit" name="le_add_idf_c"/></item>
+           <item row="5" column="0" colspan="2"><spacer><property name="orientation"><enum>Qt::Vertical</enum></property></spacer></item>
+           <item row="6" column="0" colspan="2">
+            <layout class="QHBoxLayout">
+             <item><widget class="QPushButton" name="btn_cancel_add_c"><property name="text"><string>Annuler</string></property></widget></item>
+             <item><widget class="QPushButton" name="btn_ajouter_cours"><property name="text"><string>Enregistrer le Cours</string></property></widget></item>
+            </layout>
+           </item>
+          </layout>
+         </widget>
+        </item>
+        <item><spacer><property name="orientation"><enum>Qt::Vertical</enum></property></spacer></item>
+       </layout>
+      </widget>
+
+      <!-- PAGE 4: STATS -->
+      <widget class="QWidget" name="page_stats">
+       <layout class="QVBoxLayout" name="vl_stats">
+        <property name="margin"><number>20</number></property>
+        <item><widget class="QWidget" name="chartContainer" native="true"/></item>
+       </layout>
+      </widget>
+
+     </widget>
+    </item>
+   </layout>
+  </widget>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>
