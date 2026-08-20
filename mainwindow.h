@@ -22,7 +22,8 @@ private slots:
     // Navigation Sidebar
     void on_btn_nav_formateurs_clicked();
     void on_btn_nav_cours_clicked();
-    void on_btn_nav_stats_clicked();
+    void on_btn_nav_stats_f_clicked();
+    void on_btn_nav_stats_c_clicked();
 
     // Navigation Ajout
     void on_btn_go_add_formateur_clicked();

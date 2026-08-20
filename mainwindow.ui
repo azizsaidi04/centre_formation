@@ -3,7 +3,7 @@
  <class>MainWindow</class>
  <widget class="QMainWindow" name="MainWindow">
   <property name="geometry">
-   <rect><x>0</x><y>0</y><width>1050</width><height>700</height></rect>
+   <rect><x>0</x><y>0</y><width>1100</width><height>750</height></rect>
   </property>
   <property name="windowTitle">
    <string>Centre de Formation - Dashboard</string>
@@ -19,19 +19,22 @@
     <!-- SIDEBAR -->
     <item>
      <widget class="QFrame" name="sidebar">
-      <property name="minimumSize"><size><width>220</width><height>0</height></size></property>
-      <property name="maximumSize"><size><width>220</width><height>16777215</height></size></property>
+      <property name="minimumSize"><size><width>230</width><height>0</height></size></property>
+      <property name="maximumSize"><size><width>230</width><height>16777215</height></size></property>
       <layout class="QVBoxLayout" name="sidebarLayout">
        <item><widget class="QLabel" name="lbl_logo"><property name="text"><string>🎓 FORMATION</string></property></widget></item>
-       <item><widget class="QPushButton" name="btn_nav_formateurs"><property name="text"><string>Gestion Formateurs</string></property><property name="checkable"><bool>true</bool></property><property name="checked"><bool>true</bool></property><property name="autoExclusive"><bool>true</bool></property></widget></item>
-       <item><widget class="QPushButton" name="btn_nav_cours"><property name="text"><string>Gestion Cours</string></property><property name="checkable"><bool>true</bool></property><property name="autoExclusive"><bool>true</bool></property></widget></item>
-       <item><widget class="QPushButton" name="btn_nav_stats"><property name="text"><string>Statistiques</string></property><property name="checkable"><bool>true</bool></property><property name="autoExclusive"><bool>true</bool></property></widget></item>
+       <item><widget class="QLabel" name="lbl_menu_1"><property name="text"><string>GESTION</string></property><property name="styleSheet"><string>color: #7f8c8d; font-size: 11px; padding-left:15px; margin-top:10px;</string></property></widget></item>
+       <item><widget class="QPushButton" name="btn_nav_formateurs"><property name="text"><string>👨‍🏫 Formateurs</string></property><property name="checkable"><bool>true</bool></property><property name="checked"><bool>true</bool></property><property name="autoExclusive"><bool>true</bool></property></widget></item>
+       <item><widget class="QPushButton" name="btn_nav_cours"><property name="text"><string>📚 Cours</string></property><property name="checkable"><bool>true</bool></property><property name="autoExclusive"><bool>true</bool></property></widget></item>
+       <item><widget class="QLabel" name="lbl_menu_2"><property name="text"><string>STATISTIQUES</string></property><property name="styleSheet"><string>color: #7f8c8d; font-size: 11px; padding-left:15px; margin-top:10px;</string></property></widget></item>
+       <item><widget class="QPushButton" name="btn_nav_stats_f"><property name="text"><string>📊 Stats Formateurs</string></property><property name="checkable"><bool>true</bool></property><property name="autoExclusive"><bool>true</bool></property></widget></item>
+       <item><widget class="QPushButton" name="btn_nav_stats_c"><property name="text"><string>📈 Stats Cours</string></property><property name="checkable"><bool>true</bool></property><property name="autoExclusive"><bool>true</bool></property></widget></item>
        <item><spacer name="verticalSpacer"><property name="orientation"><enum>Qt::Vertical</enum></property></spacer></item>
       </layout>
      </widget>
     </item>
     
-    <!-- STACKED WIDGET (RIGHT AREA) -->
+    <!-- STACKED WIDGET -->
     <item>
      <widget class="QStackedWidget" name="stackedWidget">
       <property name="currentIndex"><number>0</number></property>
@@ -65,19 +68,9 @@
              <item>
               <widget class="QStackedWidget" name="sw_details_f">
                <property name="currentIndex"><number>0</number></property>
-               <!-- Page 0: Empty State -->
                <widget class="QWidget" name="page_empty_f">
-                <layout class="QVBoxLayout">
-                 <item>
-                  <widget class="QLabel" name="lbl_empty_f">
-                   <property name="text"><string>📌 Veuillez sélectionner un formateur dans le tableau pour afficher et modifier ses détails.</string></property>
-                   <property name="alignment"><set>Qt::AlignCenter</set></property>
-                   <property name="wordWrap"><bool>true</bool></property>
-                  </widget>
-                 </item>
-                </layout>
+                <layout class="QVBoxLayout"><item><widget class="QLabel" name="lbl_empty_f"><property name="text"><string>📌 Veuillez sélectionner un formateur dans le tableau pour afficher et modifier ses détails.</string></property><property name="alignment"><set>Qt::AlignCenter</set></property><property name="wordWrap"><bool>true</bool></property></widget></item></layout>
                </widget>
-               <!-- Page 1: Details Form -->
                <widget class="QWidget" name="page_data_f">
                 <layout class="QFormLayout" name="fl_fd">
                  <property name="verticalSpacing"><number>15</number></property>
@@ -111,7 +104,7 @@
        </layout>
       </widget>
       
-      <!-- PAGE 1: ADD FORMATEUR FORM -->
+      <!-- PAGE 1: ADD FORMATEUR -->
       <widget class="QWidget" name="page_add_formateur">
        <layout class="QVBoxLayout" name="vl_af">
         <property name="margin"><number>40</number></property>
@@ -160,7 +153,7 @@
           <item><widget class="QPushButton" name="btn_trier_cours"><property name="text"><string>Trier</string></property></widget></item>
          </layout>
         </item>
-        <!-- Body: Table + Details -->
+        <!-- Body -->
         <item>
          <layout class="QHBoxLayout" name="hl_cd_body">
           <item><widget class="QTableView" name="tv_cours"><property name="selectionBehavior"><enum>QAbstractItemView::SelectRows</enum></property><property name="selectionMode"><enum>QAbstractItemView::SingleSelection</enum></property></widget></item>
@@ -173,19 +166,9 @@
              <item>
               <widget class="QStackedWidget" name="sw_details_c">
                <property name="currentIndex"><number>0</number></property>
-               <!-- Page 0: Empty State -->
                <widget class="QWidget" name="page_empty_c">
-                <layout class="QVBoxLayout">
-                 <item>
-                  <widget class="QLabel" name="lbl_empty_c">
-                   <property name="text"><string>📌 Veuillez sélectionner un cours dans le tableau pour afficher et modifier ses détails.</string></property>
-                   <property name="alignment"><set>Qt::AlignCenter</set></property>
-                   <property name="wordWrap"><bool>true</bool></property>
-                  </widget>
-                 </item>
-                </layout>
+                <layout class="QVBoxLayout"><item><widget class="QLabel" name="lbl_empty_c"><property name="text"><string>📌 Veuillez sélectionner un cours dans le tableau pour afficher et modifier ses détails.</string></property><property name="alignment"><set>Qt::AlignCenter</set></property><property name="wordWrap"><bool>true</bool></property></widget></item></layout>
                </widget>
-               <!-- Page 1: Details Form -->
                <widget class="QWidget" name="page_data_c">
                 <layout class="QFormLayout" name="fl_cd">
                  <property name="verticalSpacing"><number>15</number></property>
@@ -219,7 +202,7 @@
        </layout>
       </widget>
 
-      <!-- PAGE 3: ADD COURS FORM -->
+      <!-- PAGE 3: ADD COURS -->
       <widget class="QWidget" name="page_add_cours">
        <layout class="QVBoxLayout" name="vl_ac">
         <property name="margin"><number>40</number></property>
@@ -252,11 +235,121 @@
        </layout>
       </widget>
 
-      <!-- PAGE 4: STATS -->
-      <widget class="QWidget" name="page_stats">
-       <layout class="QVBoxLayout" name="vl_stats">
-        <property name="margin"><number>20</number></property>
-        <item><widget class="QWidget" name="chartContainer" native="true"/></item>
+      <!-- PAGE 4: STATS FORMATEUR -->
+      <widget class="QWidget" name="page_stats_f">
+       <layout class="QVBoxLayout" name="vl_sf">
+        <property name="margin"><number>30</number></property>
+        <property name="spacing"><number>30</number></property>
+        
+        <item>
+         <widget class="QLabel" name="lbl_title_sf">
+          <property name="text"><string>Aperçu Analytique des Formateurs</string></property>
+          <property name="styleSheet"><string>font-size: 24px; font-weight: bold; color: #2c3e50;</string></property>
+         </widget>
+        </item>
+        
+        <item>
+         <layout class="QHBoxLayout">
+          <item>
+           <widget class="QFrame" name="fr_kpi_f1">
+            <property name="styleSheet"><string>QFrame { background: white; border-radius: 12px; border: 1px solid #e1e8ed; }</string></property>
+            <layout class="QVBoxLayout">
+             <property name="margin"><number>20</number></property>
+             <item><widget class="QLabel" name="lbl_kpi_f_tot_title"><property name="text"><string>TOTAL FORMATEURS</string></property><property name="styleSheet"><string>color: #95a5a6; font-size: 12px; font-weight: bold; border:none;</string></property></widget></item>
+             <item><widget class="QLabel" name="lbl_kpi_f_tot"><property name="text"><string>0</string></property><property name="styleSheet"><string>color: #8e44ad; font-size: 36px; font-weight: bold; border:none;</string></property></widget></item>
+            </layout>
+           </widget>
+          </item>
+          <item>
+           <widget class="QFrame" name="fr_kpi_f2">
+            <property name="styleSheet"><string>QFrame { background: white; border-radius: 12px; border: 1px solid #e1e8ed; }</string></property>
+            <layout class="QVBoxLayout">
+             <property name="margin"><number>20</number></property>
+             <item><widget class="QLabel" name="lbl_kpi_f_spec_title"><property name="text"><string>SPÉCIALITÉ DOMINANTE</string></property><property name="styleSheet"><string>color: #95a5a6; font-size: 12px; font-weight: bold; border:none;</string></property></widget></item>
+             <item><widget class="QLabel" name="lbl_kpi_f_spec"><property name="text"><string>-</string></property><property name="styleSheet"><string>color: #1abc9c; font-size: 24px; font-weight: bold; border:none;</string></property></widget></item>
+            </layout>
+           </widget>
+          </item>
+          <item><spacer><property name="orientation"><enum>Qt::Horizontal</enum></property></spacer></item>
+         </layout>
+        </item>
+        
+        <item>
+         <layout class="QHBoxLayout">
+          <item>
+           <widget class="QFrame" name="fr_chart_f_donut">
+            <property name="styleSheet"><string>QFrame { background: white; border-radius: 12px; border: 1px solid #e1e8ed; }</string></property>
+            <layout class="QVBoxLayout"><item><widget class="QWidget" name="chartContainerF_Donut" native="true"><property name="minimumSize"><size><width>0</width><height>350</height></size></property></widget></item></layout>
+           </widget>
+          </item>
+          <item>
+           <widget class="QFrame" name="fr_chart_f_bar">
+            <property name="styleSheet"><string>QFrame { background: white; border-radius: 12px; border: 1px solid #e1e8ed; }</string></property>
+            <layout class="QVBoxLayout"><item><widget class="QWidget" name="chartContainerF_Bar" native="true"><property name="minimumSize"><size><width>0</width><height>350</height></size></property></widget></item></layout>
+           </widget>
+          </item>
+         </layout>
+        </item>
+        <item><spacer><property name="orientation"><enum>Qt::Vertical</enum></property></spacer></item>
+       </layout>
+      </widget>
+
+      <!-- PAGE 5: STATS COURS -->
+      <widget class="QWidget" name="page_stats_c">
+       <layout class="QVBoxLayout" name="vl_sc">
+        <property name="margin"><number>30</number></property>
+        <property name="spacing"><number>30</number></property>
+        
+        <item>
+         <widget class="QLabel" name="lbl_title_sc">
+          <property name="text"><string>Aperçu Analytique des Cours</string></property>
+          <property name="styleSheet"><string>font-size: 24px; font-weight: bold; color: #2c3e50;</string></property>
+         </widget>
+        </item>
+        
+        <item>
+         <layout class="QHBoxLayout">
+          <item>
+           <widget class="QFrame" name="fr_kpi_c1">
+            <property name="styleSheet"><string>QFrame { background: white; border-radius: 12px; border: 1px solid #e1e8ed; }</string></property>
+            <layout class="QVBoxLayout">
+             <property name="margin"><number>20</number></property>
+             <item><widget class="QLabel" name="lbl_kpi_c_tot_title"><property name="text"><string>TOTAL COURS</string></property><property name="styleSheet"><string>color: #95a5a6; font-size: 12px; font-weight: bold; border:none;</string></property></widget></item>
+             <item><widget class="QLabel" name="lbl_kpi_c_tot"><property name="text"><string>0</string></property><property name="styleSheet"><string>color: #3498db; font-size: 36px; font-weight: bold; border:none;</string></property></widget></item>
+            </layout>
+           </widget>
+          </item>
+          <item>
+           <widget class="QFrame" name="fr_kpi_c2">
+            <property name="styleSheet"><string>QFrame { background: white; border-radius: 12px; border: 1px solid #e1e8ed; }</string></property>
+            <layout class="QVBoxLayout">
+             <property name="margin"><number>20</number></property>
+             <item><widget class="QLabel" name="lbl_kpi_c_avg_title"><property name="text"><string>PRIX MOYEN</string></property><property name="styleSheet"><string>color: #95a5a6; font-size: 12px; font-weight: bold; border:none;</string></property></widget></item>
+             <item><widget class="QLabel" name="lbl_kpi_c_avg"><property name="text"><string>0.00 TND</string></property><property name="styleSheet"><string>color: #e67e22; font-size: 24px; font-weight: bold; border:none;</string></property></widget></item>
+            </layout>
+           </widget>
+          </item>
+          <item><spacer><property name="orientation"><enum>Qt::Horizontal</enum></property></spacer></item>
+         </layout>
+        </item>
+        
+        <item>
+         <layout class="QHBoxLayout">
+          <item>
+           <widget class="QFrame" name="fr_chart_c_area">
+            <property name="styleSheet"><string>QFrame { background: white; border-radius: 12px; border: 1px solid #e1e8ed; }</string></property>
+            <layout class="QVBoxLayout"><item><widget class="QWidget" name="chartContainerC_Area" native="true"><property name="minimumSize"><size><width>0</width><height>350</height></size></property></widget></item></layout>
+           </widget>
+          </item>
+          <item>
+           <widget class="QFrame" name="fr_chart_c_bar">
+            <property name="styleSheet"><string>QFrame { background: white; border-radius: 12px; border: 1px solid #e1e8ed; }</string></property>
+            <layout class="QVBoxLayout"><item><widget class="QWidget" name="chartContainerC_Bar" native="true"><property name="minimumSize"><size><width>0</width><height>350</height></size></property></widget></item></layout>
+           </widget>
+          </item>
+         </layout>
+        </item>
+        <item><spacer><property name="orientation"><enum>Qt::Vertical</enum></property></spacer></item>
        </layout>
       </widget>
 
