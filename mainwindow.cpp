@@ -7,16 +7,34 @@
 #include <QSqlRecord>
 #include <QVBoxLayout>
 #include <QPdfWriter>
+#include <QTextDocument>
+#include <QDateTime>
 
 #if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
 #include <QtCharts/QChartView>
 #include <QtCharts/QPieSeries>
 #include <QtCharts/QPieSlice>
+#include <QtCharts/QBarSeries>
+#include <QtCharts/QHorizontalBarSeries>
+#include <QtCharts/QBarSet>
+#include <QtCharts/QLineSeries>
+#include <QtCharts/QSplineSeries>
+#include <QtCharts/QAreaSeries>
+#include <QtCharts/QValueAxis>
+#include <QtCharts/QBarCategoryAxis>
 QT_CHARTS_USE_NAMESPACE
 #else
 #include <QtCharts/QChartView>
 #include <QtCharts/QPieSeries>
 #include <QtCharts/QPieSlice>
+#include <QtCharts/QBarSeries>
+#include <QtCharts/QHorizontalBarSeries>
+#include <QtCharts/QBarSet>
+#include <QtCharts/QLineSeries>
+#include <QtCharts/QSplineSeries>
+#include <QtCharts/QAreaSeries>
+#include <QtCharts/QValueAxis>
+#include <QtCharts/QBarCategoryAxis>
 #endif
 
 MainWindow::MainWindow(QWidget *parent)
@@ -32,10 +50,7 @@ MainWindow::MainWindow(QWidget *parent)
     ui->tv_formateur->setModel(F.afficher());
     ui->tv_cours->setModel(C.afficher());
     
-    // Layout pour les stats
-    if (!ui->chartContainer->layout()) {
-        ui->chartContainer->setLayout(new QVBoxLayout());
-    }
+    // Layouts pour les stats sont déjà définis dans l'UI
     updateStats();
 }
 
@@ -57,9 +72,16 @@ void MainWindow::on_btn_nav_cours_clicked()
     ui->stackedWidget->setCurrentIndex(2);
 }
 
-void MainWindow::on_btn_nav_stats_clicked()
+void MainWindow::on_btn_nav_stats_f_clicked()
 {
+    updateStats(); // met à jour les données
     ui->stackedWidget->setCurrentIndex(4);
+}
+
+void MainWindow::on_btn_nav_stats_c_clicked()
+{
+    updateStats(); // met à jour les données
+    ui->stackedWidget->setCurrentIndex(5);
 }
 
 // ==============================================
@@ -234,24 +256,47 @@ void MainWindow::on_btn_pdf_formateur_clicked()
     pdfWriter.setPageSize(QPageSize(QPageSize::A4));
     pdfWriter.setResolution(300);
 
-    QPainter painter(&pdfWriter);
-    painter.setPen(Qt::black);
-    painter.setFont(QFont("Arial", 20, QFont::Bold));
-    painter.drawText(2000, 1000, "Liste des Formateurs");
-
-    painter.setFont(QFont("Arial", 12));
-    int y = 2000;
+    QTextDocument doc;
+    QString dateStr = QDateTime::currentDateTime().toString("dd/MM/yyyy hh:mm");
+    
+    QString html = "<html><head><style>"
+                   "body { font-family: Arial, sans-serif; }"
+                   "h1 { font-size: 140px; color: #2c3e50; text-align: center; margin-top: 80px; }"
+                   "h2 { font-size: 100px; color: #2980b9; text-align: center; margin-bottom: 50px; }"
+                   "p.date { text-align: right; font-style: italic; color: #7f8c8d; font-size: 50px; margin-right: 5%; }"
+                   "table { width: 90%; border-collapse: collapse; margin-left: auto; margin-right: auto; margin-top: 50px; }"
+                   "th { background-color: #34495e; color: white; padding: 30px; font-size: 60px; }"
+                   "td { padding: 30px; font-size: 55px; border: 3px solid #bdc3c7; }"
+                   "p.footer { text-align: center; font-size: 40px; color: gray; margin-top: 100px; }"
+                   "</style></head><body>";
+                   
+    html += "<h1>🎓 Centre de Formation</h1>";
+    html += "<h2>Annuaire Officiel des Formateurs</h2>";
+    html += "<p class='date'>Document généré le : " + dateStr + "</p>";
+    
+    html += "<table>";
+    html += "<tr>";
+    html += "<th>ID</th><th>Nom</th><th>Prénom</th><th>Email</th><th>Spécialité</th></tr>";
+    
     QSqlQueryModel *model = F.afficher();
     for (int i = 0; i < model->rowCount(); ++i) {
-        QString ligne = "ID: " + model->record(i).value("id_formateur").toString() +
-                        " | Nom: " + model->record(i).value("nom").toString() +
-                        " | Prénom: " + model->record(i).value("prenom").toString() +
-                        " | Spécialité: " + model->record(i).value("specialite").toString();
-        painter.drawText(500, y, ligne);
-        y += 500;
+        html += "<tr>";
+        html += "<td align='center'>" + model->record(i).value("id_formateur").toString() + "</td>";
+        html += "<td>" + model->record(i).value("nom").toString() + "</td>";
+        html += "<td>" + model->record(i).value("prenom").toString() + "</td>";
+        html += "<td>" + model->record(i).value("email").toString() + "</td>";
+        html += "<td align='center'><b>" + model->record(i).value("specialite").toString() + "</b></td>";
+        html += "</tr>";
     }
-    painter.end();
-    QMessageBox::information(this, "PDF", "PDF généré avec succès !");
+    html += "</table>";
+    html += "<p class='footer'>© " + QDateTime::currentDateTime().toString("yyyy") + " - Ce document est confidentiel et réservé à l'administration du centre.</p>";
+    html += "</body></html>";
+
+    doc.setHtml(html);
+    doc.setPageSize(QSizeF(pdfWriter.width(), pdfWriter.height()));
+    doc.print(&pdfWriter);
+    
+    QMessageBox::information(this, "PDF Personnalisé", "PDF généré avec succès ! Le document a été mis en page sous forme de tableau.");
 }
 
 
@@ -334,61 +379,305 @@ void MainWindow::on_btn_pdf_cours_clicked()
     pdfWriter.setPageSize(QPageSize(QPageSize::A4));
     pdfWriter.setResolution(300);
 
-    QPainter painter(&pdfWriter);
-    painter.setPen(Qt::darkBlue);
-    painter.setFont(QFont("Arial", 20, QFont::Bold));
-    painter.drawText(2000, 1000, "Liste des Cours Proposés");
-
-    painter.setFont(QFont("Arial", 12));
-    int y = 2000;
+    QTextDocument doc;
+    QString dateStr = QDateTime::currentDateTime().toString("dd/MM/yyyy hh:mm");
+    
+    QString html = "<html><head><style>"
+                   "body { font-family: Arial, sans-serif; }"
+                   "h1 { font-size: 140px; color: #2c3e50; text-align: center; margin-top: 80px; }"
+                   "h2 { font-size: 100px; color: #e67e22; text-align: center; margin-bottom: 50px; }"
+                   "p.date { text-align: right; font-style: italic; color: #7f8c8d; font-size: 50px; margin-right: 5%; }"
+                   "table { width: 90%; border-collapse: collapse; margin-left: auto; margin-right: auto; margin-top: 50px; }"
+                   "th { background-color: #34495e; color: white; padding: 30px; font-size: 60px; }"
+                   "td { padding: 30px; font-size: 55px; border: 3px solid #bdc3c7; }"
+                   "td.prix { color: #27ae60; font-weight: bold; text-align: center; }"
+                   "p.footer { text-align: center; font-size: 40px; color: gray; margin-top: 100px; }"
+                   "</style></head><body>";
+                   
+    html += "<h1>🎓 Centre de Formation</h1>";
+    html += "<h2>Catalogue Officiel des Cours</h2>";
+    html += "<p class='date'>Document généré le : " + dateStr + "</p>";
+    
+    html += "<table>";
+    html += "<tr>";
+    html += "<th>ID</th><th>Intitulé du Cours</th><th>Durée (Heures)</th><th>Prix (TND)</th><th>ID Formateur</th></tr>";
+    
     QSqlQueryModel *model = C.afficher();
     for (int i = 0; i < model->rowCount(); ++i) {
-        QString ligne = "ID: " + model->record(i).value("id_cours").toString() +
-                        " | Intitulé: " + model->record(i).value("intitule").toString() +
-                        " | Prix: " + model->record(i).value("prix").toString() + " TND";
-        painter.drawText(500, y, ligne);
-        y += 500;
+        html += "<tr>";
+        html += "<td align='center'>" + model->record(i).value("id_cours").toString() + "</td>";
+        html += "<td>" + model->record(i).value("intitule").toString() + "</td>";
+        html += "<td align='center'>" + model->record(i).value("duree_heures").toString() + " H</td>";
+        html += "<td class='prix'>" + model->record(i).value("prix").toString() + " TND</td>";
+        html += "<td align='center'>" + model->record(i).value("id_formateur").toString() + "</td>";
+        html += "</tr>";
     }
-    painter.end();
-    QMessageBox::information(this, "PDF", "PDF généré avec succès !");
+    html += "</table>";
+    html += "<p class='footer'>© " + QDateTime::currentDateTime().toString("yyyy") + " - Ce catalogue est généré automatiquement par le système de gestion.</p>";
+    html += "</body></html>";
+
+    doc.setHtml(html);
+    doc.setPageSize(QSizeF(pdfWriter.width(), pdfWriter.height()));
+    doc.print(&pdfWriter);
+    
+    QMessageBox::information(this, "PDF Personnalisé", "PDF généré avec succès ! Le document a été mis en page sous forme de tableau professionnel.");
 }
 
 
 // ==============================================
 // 6. STATISTIQUES
 // ==============================================
-void MainWindow::updateStats()
-{
-    QLayoutItem* item;
-    while ((item = ui->chartContainer->layout()->takeAt(0)) != nullptr) {
-        if(item->widget()) {
+void clearLayoutHelper(QLayout *layout) {
+    if (!layout) return;
+    QLayoutItem *item;
+    while ((item = layout->takeAt(0)) != nullptr) {
+        if (item->widget()) {
             delete item->widget();
         }
         delete item;
     }
+}
 
-    QChart *chart = new QChart();
-    chart->setTitle("Répartition des Formateurs par Spécialité");
-    chart->setAnimationOptions(QChart::AllAnimations);
-    chart->setTheme(QChart::ChartThemeBlueCerulean);
-    
-    QFont font = chart->titleFont();
-    font.setPixelSize(18);
-    font.setBold(true);
-    chart->setTitleFont(font);
+void MainWindow::updateStats()
+{
+    // Clean old charts if they exist
+    if (ui->chartContainerF_Donut->layout()) clearLayoutHelper(ui->chartContainerF_Donut->layout());
+    if (ui->chartContainerF_Bar->layout()) clearLayoutHelper(ui->chartContainerF_Bar->layout());
+    if (ui->chartContainerC_Area->layout()) clearLayoutHelper(ui->chartContainerC_Area->layout());
+    if (ui->chartContainerC_Bar->layout()) clearLayoutHelper(ui->chartContainerC_Bar->layout());
 
-    QPieSeries *series = new QPieSeries();
-    QSqlQueryModel* modelStats = F.statsSpecialite();
+    QFont fontTitle; fontTitle.setPixelSize(14); fontTitle.setBold(true);
+
+    // ==========================================
+    // MODULE 1 : STATS FORMATEURS
+    // ==========================================
     
-    for(int i = 0; i < modelStats->rowCount(); i++) {
-        QString spec = modelStats->record(i).value("specialite").toString();
-        int count = modelStats->record(i).value("nb").toInt();
-        series->append(spec + " (" + QString::number(count) + ")", count);
+    // KPI 1 : Total Formateurs & Spécialité dominante
+    int totalF = 0;
+    QString specDominante = "-";
+    QSqlQuery qF("SELECT COUNT(*) FROM Formateur");
+    if(qF.next()) totalF = qF.value(0).toInt();
+    
+    QSqlQuery qSpecDom("SELECT specialite FROM Formateur GROUP BY specialite ORDER BY COUNT(*) DESC FETCH FIRST 1 ROWS ONLY");
+    // Fallback for sqlite if FETCH FIRST fails: SELECT specialite, COUNT(*) c FROM Formateur GROUP BY specialite ORDER BY c DESC LIMIT 1
+    if(!qSpecDom.next()) {
+        QSqlQuery qSpecDomLite("SELECT specialite FROM Formateur GROUP BY specialite ORDER BY COUNT(*) DESC LIMIT 1");
+        if(qSpecDomLite.next()) specDominante = qSpecDomLite.value(0).toString();
+    } else {
+        specDominante = qSpecDom.value(0).toString();
+    }
+    
+    ui->lbl_kpi_f_tot->setText(QString::number(totalF));
+    ui->lbl_kpi_f_spec->setText(specDominante);
+
+    // Chart 1: Donut (Spécialités)
+    QChart *fDonutChart = new QChart();
+    fDonutChart->setAnimationOptions(QChart::SeriesAnimations);
+    fDonutChart->legend()->setAlignment(Qt::AlignRight);
+    
+    QPieSeries *fDonutSeries = new QPieSeries();
+    fDonutSeries->setHoleSize(0.6); 
+    
+    QSqlQueryModel* modelSpec = F.statsSpecialite();
+    QStringList fColors = {"#8e44ad", "#1abc9c", "#e67e22", "#3498db", "#e74c3c"};
+    for(int i = 0; i < modelSpec->rowCount(); i++) {
+        QString spec = modelSpec->record(i).value("specialite").toString();
+        int count = modelSpec->record(i).value("nb").toInt();
+        QPieSlice *slice = fDonutSeries->append(spec + " (" + QString::number(count) + ")", count);
+        slice->setBrush(QColor(fColors[i % fColors.size()]));
+        slice->setLabelVisible(false);
+    }
+    
+    fDonutChart->addSeries(fDonutSeries);
+    fDonutChart->setTitle("Répartition par Spécialité");
+    fDonutChart->setTitleFont(fontTitle);
+    fDonutChart->setBackgroundVisible(false);
+    
+    QChartView *fDonutView = new QChartView(fDonutChart);
+    fDonutView->setRenderHint(QPainter::Antialiasing);
+    if (!ui->chartContainerF_Donut->layout()) ui->chartContainerF_Donut->setLayout(new QVBoxLayout());
+    ui->chartContainerF_Donut->layout()->addWidget(fDonutView);
+
+    // Chart 2: Horizontal Bar (Charge de Travail / Top 5 Formateurs)
+    QChart *fHBarChart = new QChart();
+    fHBarChart->setAnimationOptions(QChart::SeriesAnimations);
+    fHBarChart->legend()->hide();
+    fHBarChart->setBackgroundVisible(false);
+    
+    QHorizontalBarSeries *fHBarSeries = new QHorizontalBarSeries();
+    QBarSet *fHSet = new QBarSet("Heures d'enseignement");
+    fHSet->setColor(QColor("#8e44ad")); // Purple 
+    
+    // Jointure : Calculer le nombre total d'heures de cours pour chaque formateur
+    QSqlQuery qWorkload("SELECT F.nom, COALESCE(SUM(C.duree_heures), 0) as total_heures FROM Formateur F LEFT JOIN Cours C ON F.id_formateur = C.id_formateur GROUP BY F.id_formateur, F.nom ORDER BY total_heures DESC"); 
+    
+    QStringList fHCategories;
+    int fHMax = 0;
+    
+    struct WorkloadData { QString nom; int heures; };
+    QList<WorkloadData> wlList;
+    while(qWorkload.next()) {
+        wlList.append({qWorkload.value(0).toString(), qWorkload.value(1).toInt()});
+    }
+    
+    // Garder seulement les Top 5
+    if(wlList.size() > 5) wlList = wlList.mid(0, 5);
+    
+    // Insérer à l'envers car QHorizontalBarSeries dessine de bas en haut
+    for(int i = wlList.size() - 1; i >= 0; i--) {
+        fHCategories << wlList[i].nom;
+        *fHSet << wlList[i].heures;
+        if(wlList[i].heures > fHMax) fHMax = wlList[i].heures;
+    }
+    
+    if(wlList.isEmpty()) { fHCategories << "-"; *fHSet << 0; } // Fallback
+    
+    fHBarSeries->append(fHSet);
+    fHBarChart->addSeries(fHBarSeries);
+    
+    QBarCategoryAxis *fAxisYHoriz = new QBarCategoryAxis();
+    fAxisYHoriz->append(fHCategories);
+    fAxisYHoriz->setGridLineVisible(false);
+    fAxisYHoriz->setLineVisible(false);
+    fHBarChart->addAxis(fAxisYHoriz, Qt::AlignLeft);
+    fHBarSeries->attachAxis(fAxisYHoriz);
+    
+    QValueAxis *fAxisXHoriz = new QValueAxis();
+    fAxisXHoriz->setRange(0, qMax(10, fHMax + (fHMax / 4) + 5));
+    fAxisXHoriz->setLabelFormat("%d H");
+    fAxisXHoriz->setGridLineVisible(false);
+    fHBarChart->addAxis(fAxisXHoriz, Qt::AlignBottom);
+    fHBarSeries->attachAxis(fAxisXHoriz);
+    
+    fHBarChart->setTitle("Charge de Travail (Top 5 Formateurs)");
+    fHBarChart->setTitleFont(fontTitle);
+    
+    QChartView *fHBarView = new QChartView(fHBarChart);
+    fHBarView->setRenderHint(QPainter::Antialiasing);
+    if (!ui->chartContainerF_Bar->layout()) ui->chartContainerF_Bar->setLayout(new QVBoxLayout());
+    ui->chartContainerF_Bar->layout()->addWidget(fHBarView);
+
+
+    // ==========================================
+    // MODULE 2 : STATS COURS
+    // ==========================================
+    
+    // KPI Cours
+    int totalC = 0;
+    double avgPrix = 0;
+    QSqlQuery qC("SELECT COUNT(*), AVG(prix) FROM Cours");
+    if(qC.next()) {
+        totalC = qC.value(0).toInt();
+        avgPrix = qC.value(1).toDouble();
+    }
+    
+    ui->lbl_kpi_c_tot->setText(QString::number(totalC));
+    ui->lbl_kpi_c_avg->setText(QString("%1 TND").arg(QString::number(avgPrix, 'f', 2)));
+
+    // Chart 1: Area Spline Chart (Impact de la Durée sur le Prix)
+    QChart *cAreaChart = new QChart();
+    cAreaChart->setAnimationOptions(QChart::SeriesAnimations);
+    cAreaChart->legend()->hide();
+    cAreaChart->setBackgroundVisible(false);
+    
+    QSplineSeries *cLineSeries = new QSplineSeries();
+    QPen penArea(QColor("#e67e22")); 
+    penArea.setWidth(3);
+    cLineSeries->setPen(penArea);
+    
+    // Requête innovante : Le prix moyen augmente-t-il avec la durée du cours ?
+    QSqlQuery queryPrix("SELECT duree_heures, AVG(prix) FROM Cours GROUP BY duree_heures ORDER BY duree_heures ASC");
+    double maxDuree = 0;
+    double maxPrixAvg = 0;
+    int countPoints = 0;
+    
+    // Add a starting point at 0,0 for a better area fill visual
+    cLineSeries->append(0, 0); 
+    
+    while(queryPrix.next()) {
+        double d = queryPrix.value(0).toDouble();
+        double p = queryPrix.value(1).toDouble();
+        cLineSeries->append(d, p);
+        if(d > maxDuree) maxDuree = d;
+        if(p > maxPrixAvg) maxPrixAvg = p;
+        countPoints++;
     }
 
-    chart->addSeries(series);
-    QChartView *chartView = new QChartView(chart);
-    chartView->setRenderHint(QPainter::Antialiasing);
+    QAreaSeries *cAreaSeries = new QAreaSeries(cLineSeries);
+    QColor areaColor("#e67e22");
+    areaColor.setAlpha(60); 
+    cAreaSeries->setBrush(areaColor);
+    cAreaSeries->setPen(Qt::NoPen);
+    
+    cAreaChart->addSeries(cAreaSeries);
+    cAreaChart->addSeries(cLineSeries);
+    
+    QValueAxis *cAxisXArea = new QValueAxis();
+    cAxisXArea->setRange(0, qMax(10.0, maxDuree + 5)); // Marge pour l'axe X
+    cAxisXArea->setLabelFormat("%d H");
+    cAxisXArea->setGridLineVisible(false);
+    cAreaChart->addAxis(cAxisXArea, Qt::AlignBottom);
+    cAreaSeries->attachAxis(cAxisXArea);
+    cLineSeries->attachAxis(cAxisXArea);
+    
+    QValueAxis *cAxisYArea = new QValueAxis();
+    cAxisYArea->setRange(0, maxPrixAvg + (maxPrixAvg*0.2) + 10);
+    cAxisYArea->setLabelFormat("%d TND");
+    cAxisYArea->setLineVisible(false);
+    cAreaChart->addAxis(cAxisYArea, Qt::AlignLeft);
+    cAreaSeries->attachAxis(cAxisYArea);
+    cLineSeries->attachAxis(cAxisYArea);
+    
+    cAreaChart->setTitle("Corrélation : Impact de la Durée sur le Prix");
+    cAreaChart->setTitleFont(fontTitle);
+    
+    QChartView *cAreaView = new QChartView(cAreaChart);
+    cAreaView->setRenderHint(QPainter::Antialiasing);
+    if (!ui->chartContainerC_Area->layout()) ui->chartContainerC_Area->setLayout(new QVBoxLayout());
+    ui->chartContainerC_Area->layout()->addWidget(cAreaView);
 
-    ui->chartContainer->layout()->addWidget(chartView);
+    // Chart 2: Bar Chart (Cours par Durée)
+    QChart *cBarChart = new QChart();
+    cBarChart->setAnimationOptions(QChart::SeriesAnimations);
+    cBarChart->legend()->hide();
+    cBarChart->setBackgroundVisible(false);
+    
+    QBarSeries *cBarSeries = new QBarSeries();
+    QSqlQueryModel* modelDuree = C.statsDuree();
+    
+    QStringList cCategories;
+    QBarSet *cSet = new QBarSet("Cours");
+    cSet->setColor(QColor("#3498db")); 
+    
+    int cMaxBar = 0;
+    for(int i = 0; i < modelDuree->rowCount(); i++) {
+        QString duree = modelDuree->record(i).value("duree_heures").toString() + "H";
+        int count = modelDuree->record(i).value("nb").toInt();
+        cCategories << duree;
+        *cSet << count;
+        if(count > cMaxBar) cMaxBar = count;
+    }
+    cBarSeries->append(cSet);
+    cBarChart->addSeries(cBarSeries);
+    
+    QBarCategoryAxis *cAxisX = new QBarCategoryAxis();
+    cAxisX->append(cCategories);
+    cAxisX->setGridLineVisible(false);
+    cBarChart->addAxis(cAxisX, Qt::AlignBottom);
+    cBarSeries->attachAxis(cAxisX);
+    
+    QValueAxis *cAxisY = new QValueAxis();
+    cAxisY->setRange(0, cMaxBar + 1);
+    cAxisY->setLabelFormat("%d");
+    cAxisY->setLineVisible(false);
+    cBarChart->addAxis(cAxisY, Qt::AlignLeft);
+    cBarSeries->attachAxis(cAxisY);
+    
+    cBarChart->setTitle("Répartition par Durée");
+    cBarChart->setTitleFont(fontTitle);
+    
+    QChartView *cBarView = new QChartView(cBarChart);
+    cBarView->setRenderHint(QPainter::Antialiasing);
+    if (!ui->chartContainerC_Bar->layout()) ui->chartContainerC_Bar->setLayout(new QVBoxLayout());
+    ui->chartContainerC_Bar->layout()->addWidget(cBarView);
 }
