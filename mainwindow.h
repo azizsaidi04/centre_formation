@@ -50,6 +50,7 @@ private slots:
     void on_btn_rechercher_cours_clicked();
     void on_btn_trier_cours_clicked();
     void on_btn_pdf_cours_clicked();
+    void on_btn_notifier_formateur_clicked();
 
     // Stats
     void updateStats();

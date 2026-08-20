@@ -9,6 +9,9 @@
 #include <QPdfWriter>
 #include <QTextDocument>
 #include <QDateTime>
+#include <QDesktopServices>
+#include <QUrl>
+#include <QProcess>
 
 #if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
 #include <QtCharts/QChartView>
@@ -421,6 +424,101 @@ void MainWindow::on_btn_pdf_cours_clicked()
     doc.print(&pdfWriter);
     
     QMessageBox::information(this, "PDF Personnalisé", "PDF généré avec succès ! Le document a été mis en page sous forme de tableau professionnel.");
+}
+
+void MainWindow::on_btn_notifier_formateur_clicked()
+{
+    int idCours = ui->le_id_cours->text().toInt();
+    int idFormateur = ui->le_id_formateur_cours->text().toInt();
+    
+    if(idCours == 0 || idFormateur == 0) {
+        QMessageBox::warning(this, "Avertissement", "Veuillez sélectionner un cours pour notifier son formateur.");
+        return;
+    }
+    
+    // Récupérer l'email et le nom du formateur
+    QSqlQuery q;
+    q.prepare("SELECT nom, prenom, email FROM Formateur WHERE id_formateur = :id");
+    q.bindValue(":id", idFormateur);
+    
+    if(!q.exec() || !q.next()) {
+        QMessageBox::critical(this, "Erreur", "Impossible de trouver les informations du formateur assigné à ce cours.");
+        return;
+    }
+    
+    QString email = q.value("email").toString();
+    QString nomComplet = q.value("nom").toString() + " " + q.value("prenom").toString();
+    
+    if(email.isEmpty()) {
+        QMessageBox::warning(this, "Avertissement", "Ce formateur n'a pas d'adresse email enregistrée.");
+        return;
+    }
+    
+    // Préparer le contenu de l'email
+    QString intitule = ui->le_intitule_cours->text();
+    QString duree = ui->le_duree_cours->text();
+    QString prix = ui->le_prix_cours->text();
+    
+    QString subject = "Nouvelle affectation : Cours de " + intitule;
+    QString body = "Bonjour " + nomComplet + ",\n\n"
+                   "Nous avons le plaisir de vous informer qu'un nouveau cours vous a ete affecte au Centre de Formation.\n\n"
+                   "Details du cours :\n"
+                   "- Intitule : " + intitule + "\n"
+                   "- Duree : " + duree + " Heures\n"
+                   "- Remuneration globale : " + prix + " TND\n\n"
+                   "Merci de nous confirmer votre disponibilite dans les plus brefs delais.\n\n"
+                   "Cordialement,\nL'Administration.";
+                   
+    // ==========================================================
+    // ENVOI D'EMAIL AUTOMATIQUE EN ARRIÈRE-PLAN (SMTP)
+    // ==========================================================
+    
+    // ⚠️ INSTRUCTIONS POUR L'ÉTUDIANT : 
+    // Remplacez ces deux lignes par votre VRAIE adresse Gmail et votre Mot de Passe d'Application (16 caractères)
+    // (Pour l'obtenir : Compte Google -> Sécurité -> Validation en 2 étapes -> Mots de passe d'application)
+    QString myEmail = "aziz.saidi331@gmail.com";
+    QString myPassword = "xfqptgkhgdecgcsb";
+    
+    // Échapper les apostrophes pour le script PowerShell
+    QString safeSubject = subject; safeSubject.replace("'", "''");
+    QString safeBody = body; safeBody.replace("'", "''");
+    
+    // Création d'un script PowerShell dynamique pour utiliser le serveur SMTP de Windows (.NET)
+    // Avantage : Aucune dépendance OpenSSL externe requise pour Qt !
+    QString psScript = 
+        "$smtp = New-Object Net.Mail.SmtpClient('smtp.gmail.com', 587);\n"
+        "$smtp.EnableSsl = $true;\n"
+        "$smtp.Credentials = New-Object System.Net.NetworkCredential('" + myEmail + "', '" + myPassword + "');\n"
+        "$msg = New-Object Net.Mail.MailMessage;\n"
+        "$msg.From = '" + myEmail + "';\n"
+        "$msg.To.Add('" + email + "');\n"
+        "$msg.Subject = '" + safeSubject + "';\n"
+        "$msg.Body = '" + safeBody + "';\n"
+        "try { $smtp.Send($msg); exit 0; } catch { exit 1; }";
+
+    QFile file("mailer.ps1");
+    if(file.open(QIODevice::WriteOnly | QIODevice::Text)) {
+        QTextStream out(&file);
+        out << psScript;
+        file.close();
+        
+        QProcess *process = new QProcess(this);
+        connect(process, QOverload<int, QProcess::ExitStatus>::of(&QProcess::finished),
+                [=](int exitCode, QProcess::ExitStatus /*exitStatus*/){
+            if(exitCode == 0) {
+                QMessageBox::information(this, "Succès", "L'email a été envoyé automatiquement en arrière-plan à " + email + " !");
+            } else {
+                QMessageBox::critical(this, "Erreur SMTP", "L'envoi a échoué. Vérifiez vos identifiants Gmail (Mot de passe d'application).");
+            }
+            process->deleteLater();
+            QFile::remove("mailer.ps1"); // Nettoyage
+        });
+        
+        process->start("powershell", QStringList() << "-ExecutionPolicy" << "Bypass" << "-WindowStyle" << "Hidden" << "-File" << "mailer.ps1");
+        QMessageBox::information(this, "Envoi en cours", "Tentative de connexion au serveur SMTP...\nL'email est en cours d'envoi en arrière-plan.");
+    } else {
+        QMessageBox::critical(this, "Erreur", "Impossible de créer le script d'envoi.");
+    }
 }
 
 

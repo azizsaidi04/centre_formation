@@ -189,6 +189,12 @@
                    <item><widget class="QPushButton" name="btn_supprimer_cours"><property name="text"><string>Supprimer</string></property></widget></item>
                   </layout>
                  </item>
+                 <item row="7" column="0" colspan="2">
+                  <widget class="QPushButton" name="btn_notifier_formateur">
+                   <property name="text"><string>✉️ Notifier Formateur (Email)</string></property>
+                   <property name="styleSheet"><string>background-color: #3498db; color: white;</string></property>
+                  </widget>
+                 </item>
                 </layout>
                </widget>
               </widget>
